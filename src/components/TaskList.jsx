@@ -1,39 +1,51 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
+import React, { useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { deleteTask } from '../store/actions';
 import styled from 'styled-components';
-
-
+import { Link } from 'react-router-dom';
 
 const TaskList = () => {
+  const [search, setSearch] = useState('');
   const tasks = useSelector(state => state.tasks);
   const dispatch = useDispatch();
 
   const handleDelete = (id) => {
-    if (window.confirm("Are you sure you want to delete this task?")) {
-      dispatch(deleteTask(id));
-    }
+    if (window.confirm("Are you sure you want to delete this task?"))
+    dispatch(deleteTask(id));
   };
+
+  const filteredTasks = tasks.filter(task => 
+    task.name.toLowerCase().includes(search.toLowerCase())
+  );
 
   return (
     <Container>
       <h1>Task List</h1>
-      <AddButton to="/add">Add Task</AddButton>
-      <TaskListWrapper>
-        {tasks.map(task => (
+      <SearchBar 
+        type="text"
+        placeholder="Search tasks..."
+        value={search}
+        onChange={(e) => setSearch(e.target.value)}
+      />
+      <TaskLists>
+        {filteredTasks.map(task => (
           <TaskItem key={task.id}>
             <TaskDetails>
-              <TaskName>{task.name}</TaskName>
-              <TaskDescription>{task.description}</TaskDescription>
+              <h2>{task.name}</h2>
+              <p>{task.description}</p>
             </TaskDetails>
-            <Link to={`/edit/${task.id}`}>
-              <ActionButton>Edit</ActionButton>
-            </Link>
-            <ActionButton onClick={() => handleDelete(task.id)}>Delete</ActionButton>
+            <TaskActions>
+              <Link to={`/edit/${task.id}`}>
+                <Button>Edit</Button>
+              </Link>
+              <DeleteButton onClick={() => handleDelete(task.id)}>Delete</DeleteButton>
+            </TaskActions>
           </TaskItem>
         ))}
-      </TaskListWrapper>
+      </TaskLists>
+      <Link to="/add">
+        <Button>Add Task</Button>
+      </Link>
     </Container>
   );
 };
@@ -44,15 +56,24 @@ const Container = styled.div`
   padding: 20px;
 `;
 
-const TaskListWrapper = styled.ul`
+const SearchBar = styled.input`
+  margin-bottom: 20px;
+  padding: 10px;
+  font-size: 1em;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  width: 50%;
+`;
+
+const TaskLists = styled.ul`
   list-style-type: none;
   padding: 0;
 `;
 
 const TaskItem = styled.li`
-  background: #f9f9f9;
   margin-bottom: 10px;
-  padding: 15px;
+  padding: 10px;
+  border: 1px solid #ccc;
   border-radius: 5px;
   display: flex;
   justify-content: space-between;
@@ -64,41 +85,30 @@ const TaskDetails = styled.div`
   margin-right: 20px;
 `;
 
-const TaskName = styled.h3`
-  margin: 0;
-  font-size: 1.2em;
+const TaskActions = styled.div`
+  display: flex;
+  gap: 10px;
 `;
 
-const TaskDescription = styled.p`
-  margin: 5px 0;
-`;
-
-const ActionButton = styled.button`
-  margin-left: 10px;
-  padding: 5px 10px;
-  background: #007bff;
-  color: #fff;
-  border: none;
-  border-radius: 3px;
-  cursor: pointer;
-
-  &:hover {
-    background: #0056b3;
-  }
-`;
-
-const AddButton = styled(Link)`
-  display: inline-block;
-  margin-bottom: 20px;
-  padding: 10px 20px;
+const Button = styled.button`
+  padding: 10px;
+  font-size: 1em;
   background: #28a745;
   color: #fff;
   border: none;
   border-radius: 5px;
-  text-decoration: none;
-  text-align: center;
+  cursor: pointer;
 
   &:hover {
     background: #218838;
   }
 `;
+
+const DeleteButton = styled(Button)`
+  background: #dc3545;
+
+  &:hover {
+    background: #c82333;
+  }
+`;
+
