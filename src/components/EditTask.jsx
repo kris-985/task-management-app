@@ -1,35 +1,53 @@
-import React, { useState, useEffect } from 'react';
-import { useSelector, useDispatch } from 'react-redux';
-import { useParams, useNavigate } from 'react-router-dom';
-import { editTask } from '../store/actions';
-import styled, { css } from 'styled-components';
+import React, { useState, useEffect, useRef } from "react";
+import { useSelector, useDispatch } from "react-redux";
+import { useParams, useNavigate } from "react-router-dom";
+import { editTask } from "../store/actions";
+import styled from "styled-components";
 
-const EditTask = ({ darkMode }) => {
+const EditTask = () => {
   const { id } = useParams();
   const tasks = useSelector((state) => state.tasks);
   const task = tasks.find((task) => task.id === id);
-  const [name, setName] = useState(task ? task.name : '');
-  const [description, setDescription] = useState(task ? task.description : '');
-  const [priority, setPriority] = useState(task ? task.priority : 'low'); 
-  const [dueDate, setDueDate] = useState(task ? task.dueDate : ''); 
+  const [name, setName] = useState(task ? task.name : "");
+  const [description, setDescription] = useState(task ? task.description : "");
+  const [priority, setPriority] = useState(task ? task.priority : "low");
+  const [dueDate, setDueDate] = useState(task ? task.dueDate : "");
+  const [timeSpent, setTimeSpent] = useState(task ? task.timeSpent || 0 : 0);
+  const [isTimerRunning, setIsTimerRunning] = useState(task ? task.isTimerRunning || false : false);
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const timerRef = useRef(null);
 
   useEffect(() => {
     if (!task) {
-      navigate('/');
+      navigate("/");
     }
   }, [task, navigate]);
 
+  useEffect(() => {
+    if (isTimerRunning) {
+      timerRef.current = setInterval(() => {
+        setTimeSpent(prev => prev + 1);
+      }, 1000);
+    } else {
+      clearInterval(timerRef.current);
+    }
+    return () => clearInterval(timerRef.current);
+  }, [isTimerRunning]);
+
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (name.trim() === '') return;
-    dispatch(editTask({ id, name, description, priority, dueDate }));
-    navigate('/');
+    if (name.trim() === "") return;
+    dispatch(editTask({ id, name, description, priority, dueDate, timeSpent, isTimerRunning }));
+    navigate("/");
+  };
+
+  const handleStartStopTimer = () => {
+    setIsTimerRunning(!isTimerRunning);
   };
 
   return (
-    <Container darkMode={darkMode}>
+    <Container>
       <h1>Edit Task</h1>
       <Form onSubmit={handleSubmit}>
         <Input
@@ -37,19 +55,13 @@ const EditTask = ({ darkMode }) => {
           placeholder="Task Name"
           value={name}
           onChange={(e) => setName(e.target.value)}
-          darkMode={darkMode}
         />
         <Textarea
           placeholder="Task Description"
           value={description}
           onChange={(e) => setDescription(e.target.value)}
-          darkMode={darkMode}
         />
-        <Select
-          value={priority}
-          onChange={(e) => setPriority(e.target.value)}
-          darkMode={darkMode}
-        >
+        <Select value={priority} onChange={(e) => setPriority(e.target.value)}>
           <option value="low">Low</option>
           <option value="medium">Medium</option>
           <option value="high">High</option>
@@ -58,12 +70,15 @@ const EditTask = ({ darkMode }) => {
           type="date"
           value={dueDate}
           onChange={(e) => setDueDate(e.target.value)}
-          darkMode={darkMode}
         />
-        <Button type="submit" darkMode={darkMode}>
-          Save
-        </Button>
+        <Button type="submit">Save</Button>
       </Form>
+      <Timer>
+        <p>Time Spent: {Math.floor(timeSpent / 3600)}h {Math.floor((timeSpent % 3600) / 60)}m {timeSpent % 60}s</p>
+        <Button onClick={handleStartStopTimer}>
+          {isTimerRunning ? "Pause" : "Start"}
+        </Button>
+      </Timer>
     </Container>
   );
 };
@@ -72,26 +87,11 @@ export default EditTask;
 
 const Container = styled.div`
   padding: 20px;
-
-  ${(props) =>
-    props.darkMode &&
-    css`
-      background-color: #333;
-      color: #fff;
-    `}
 `;
 
 const Form = styled.form`
   display: flex;
   flex-direction: column;
-  
-  ${(props) =>
-    props.darkMode &&
-    css`
-      background-color: #444;
-      color: #fff;
-      border-color: #666;
-    `}
 `;
 
 const Input = styled.input`
@@ -100,14 +100,6 @@ const Input = styled.input`
   font-size: 1em;
   border: 1px solid #ccc;
   border-radius: 5px;
-
-  ${(props) =>
-    props.darkMode &&
-    css`
-      background-color: #444;
-      color: #fff;
-      border-color: #666;
-    `}
 `;
 
 const Textarea = styled.textarea`
@@ -116,14 +108,6 @@ const Textarea = styled.textarea`
   font-size: 1em;
   border: 1px solid #ccc;
   border-radius: 5px;
-
-  ${(props) =>
-    props.darkMode &&
-    css`
-      background-color: #444;
-      color: #fff;
-      border-color: #666;
-    `}
 `;
 
 const Select = styled.select`
@@ -132,15 +116,7 @@ const Select = styled.select`
   font-size: 1em;
   border: 1px solid #ccc;
   border-radius: 5px;
-  background-color: #fff; /* Default background color */
-
-  ${(props) =>
-    props.darkMode &&
-    css`
-      background-color: #444;
-      color: #fff;
-      border-color: #666;
-    `}
+  background-color: #fff;
 `;
 
 const Button = styled.button`
@@ -156,14 +132,8 @@ const Button = styled.button`
   &:hover {
     background: #0056b3;
   }
+`;
 
-  ${(props) =>
-    props.darkMode &&
-    css`
-      background: #2196f3;
-
-      &:hover {
-        background: #1e88e5;
-      }
-    `}
+const Timer = styled.div`
+  margin-top: 20px;
 `;
