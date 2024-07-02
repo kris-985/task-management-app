@@ -57,7 +57,8 @@ const Container = styled.div`
 `;
 const Title = styled.h1`
   text-align: center;
-  color:  #007bff;
+  color: #398AB9;
+  font-size: 40px;
 `
 const Form = styled.form`
   display: flex;
@@ -68,7 +69,7 @@ const Input = styled.input`
   margin-bottom: 10px;
   padding: 10px;
   font-size: 1.5em;
-  border: 3px solid #007bff;
+  border: 3px solid #398AB9;
   border-radius: 5px;
 `;
 
@@ -79,7 +80,7 @@ const Textarea = styled.textarea`
   padding: 12px 20px;
   box-sizing: border-box;
   font-size: 1.5em;
-  border: 3px solid #007bff;
+  border: 3px solid #398AB9;
   border-radius: 5px;
   resize: none;
 `;
@@ -88,15 +89,15 @@ const Select = styled.select`
   margin-bottom: 10px;
   padding: 10px;
   font-size: 1em;
-  border: 3px solid #007bff;
+  border: 3px solid #398AB9;
   border-radius: 5px;
 `;
 
 const Button = styled.button`
   width: 10rem;
   padding: 10px;
-  font-size: 1em;
-  background: #007bff;
+  font-size: 1.5em;
+  background: #398AB9;
   color: #fff;
   border: none;
   border-radius: 5px;

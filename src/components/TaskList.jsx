@@ -1,14 +1,15 @@
-import React, { useState } from 'react';
-import { useSelector, useDispatch } from 'react-redux';
-import { Link } from 'react-router-dom';
-import { deleteTask, reorderTasks, resetTimer } from '../store/actions';
-import styled from 'styled-components';
-import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
+import React, { useState } from "react";
+import { useSelector, useDispatch } from "react-redux";
+import { Link } from "react-router-dom";
+import { deleteTask, reorderTasks, resetTimer } from "../store/actions";
+import styled from "styled-components";
+import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
 import { RiSearchLine } from "react-icons/ri";
-
+import { TbCalendarDue } from "react-icons/tb";
+import { FaUserClock } from "react-icons/fa";
 
 const TaskList = () => {
-  const [search, setSearch] = useState('');
+  const [search, setSearch] = useState("");
   const tasks = useSelector((state) =>
     [...state.tasks].sort((a, b) => {
       if (!a.dueDate) return 1;
@@ -18,7 +19,7 @@ const TaskList = () => {
   );
   const dispatch = useDispatch();
 
-  const filteredTasks = tasks.filter(task => 
+  const filteredTasks = tasks.filter((task) =>
     task.name.toLowerCase().includes(search.toLowerCase())
   );
 
@@ -44,18 +45,21 @@ const TaskList = () => {
 
   return (
     <Container>
-      <h1>Task List</h1>
-      <Link to="/add">
+      <Header>Task List</Header>
+      <ButtonLink to="/add">
         <AddButton>Add Task</AddButton>
-      </Link>
-      <SearchContainer>
-        <RiSearchLineStyled />
-        <SearchBar 
-          type="text"
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-        />
-      </SearchContainer>
+      </ButtonLink>
+      <ParentContainer>
+        <SearchContainer>
+          <RiSearchLineStyled />
+          <SearchBar
+            type="text"
+            placeholder="Search tasks..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+          />
+        </SearchContainer>
+      </ParentContainer>
       <DragDropContext onDragEnd={onDragEnd}>
         <Droppable droppableId="tasks">
           {(provided) => (
@@ -63,9 +67,9 @@ const TaskList = () => {
               {filteredTasks.map((task, index) => (
                 <Draggable key={task.id} draggableId={task.id} index={index}>
                   {(provided) => (
-                    <TaskItem 
-                      ref={provided.innerRef} 
-                      {...provided.draggableProps} 
+                    <TaskItem
+                      ref={provided.innerRef}
+                      {...provided.draggableProps}
                       {...provided.dragHandleProps}
                     >
                       <TaskInfo>
@@ -73,20 +77,32 @@ const TaskList = () => {
                         <p>{task.description}</p>
                         {task.priority && (
                           <TaskPriority priority={task.priority}>
-                            Priority:
+                            Priority:{""}
                             {task.priority.charAt(0).toUpperCase() +
                               task.priority.slice(1)}
                           </TaskPriority>
                         )}
-                        {task.dueDate && <p>Due Date: {task.dueDate}</p>}
-                        <p>Time Spent: {Math.floor(task.timeSpent / 3600)}h {Math.floor((task.timeSpent % 3600) / 60)}m {task.timeSpent % 60}s</p>
+                        {task.dueDate && (
+                          <Paragraph>
+                            <TbCalendarDue /> {task.dueDate}
+                          </Paragraph>
+                        )}
+                        <Paragraph>
+                          <FaUserClock /> {Math.floor(task.timeSpent / 3600)}h{""}
+                          {Math.floor((task.timeSpent % 3600) / 60)}m{""}
+                          {task.timeSpent % 60}s
+                        </Paragraph>
                       </TaskInfo>
                       <TaskActions>
                         <Link to={`/edit/${task.id}`}>
                           <Button>Edit</Button>
                         </Link>
-                        <Button onClick={() => handleDelete(task.id)}>Delete</Button>
-                        <Button onClick={() => handleResetTimer(task.id)}>Reset Timer</Button>
+                        <Button onClick={() => handleDelete(task.id)}>
+                          Delete
+                        </Button>
+                        <Button onClick={() => handleResetTimer(task.id)}>
+                          Reset Timer
+                        </Button>
                       </TaskActions>
                     </TaskItem>
                   )}
@@ -106,12 +122,25 @@ export default TaskList;
 const Container = styled.div`
   padding: 20px;
 `;
+const Header = styled.h1`
+  text-align: center;
+  color: #398ab9;
+  font-size: 40px;
+`;
+
+const ButtonLink = styled(Link)`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-decoration: none;
+`;
 
 const AddButton = styled.button`
   padding: 20px;
   font-size: 20px;
-  background: #007bff;
+  background-color: #398ab9;
   color: #fff;
+  margin-bottom: 25px;
   border: none;
   border-radius: 5px;
   cursor: pointer;
@@ -120,12 +149,19 @@ const AddButton = styled.button`
     background: #0056b3;
   }
 `;
+const ParentContainer = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+`;
+
 const SearchContainer = styled.div`
   position: relative;
   display: flex;
   align-items: center;
   margin-top: 20px;
-  width: 50%;
+  width: 600px;
+  margin: 0 auto;
 `;
 
 const RiSearchLineStyled = styled(RiSearchLine)`
@@ -138,7 +174,7 @@ const RiSearchLineStyled = styled(RiSearchLine)`
 const SearchBar = styled.input`
   padding: 10px 10px 10px 40px;
   font-size: 1em;
-  border: 3px solid #007bff;
+  border: 3px solid #398ab9;
   border-radius: 10px;
   width: 100%;
 `;
@@ -147,12 +183,12 @@ const TaskItem = styled.li`
   display: flex;
   align-items: center;
   padding: 10px;
-  border: 3px solid #007bff;
+  border: 3px solid #398ab9;
   margin: 30px;
   background-color: white;
-  box-shadow: 10px 10px 10px 0px #004eff;
-  -webkit-box-shadow: 10px 10px 10px 0px #0060b3;
-  -moz-box-shadow: 10px 10px 10px 0px rgba(12, 9, 214, 0.87);
+  box-shadow: 10px 10px 10px 0px #1c658c;
+  -webkit-box-shadow: 10px 10px 10px 6px #398ab9;
+  -moz-box-shadow: 10px 10px 10px 5px rgba(12, 9, 214, 0.87);
 `;
 
 const TaskInfo = styled.div`
@@ -177,10 +213,14 @@ const TaskPriority = styled.span`
       : "#28a745"};
 `;
 
+const Paragraph = styled.p`
+  font-size: 18px;
+`;
+
 const Button = styled.button`
   padding: 5px 10px;
   font-size: 0.9em;
-  background: #007bff;
+  background: #398ab9;
   color: #fff;
   border: none;
   border-radius: 5px;
