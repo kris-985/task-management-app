@@ -2,12 +2,12 @@ import React, { useState, useEffect, useRef } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { useParams, useNavigate } from "react-router-dom";
 import { FaUserClock } from "react-icons/fa";
-import { editTask } from "../store/actions";
 import styled from "styled-components";
+import { editTask } from "../reducers/taskReducer";
 
 const EditTask = () => {
   const { id } = useParams();
-  const tasks = useSelector((state) => state.tasks);
+  const { tasks } = useSelector((state) => state.taskReducer);
   const task = tasks.find((task) => task.id === id);
   const [name, setName] = useState(task ? task.name : "");
   const [description, setDescription] = useState(task ? task.description : "");
@@ -51,7 +51,7 @@ const EditTask = () => {
         timeSpent,
         isTimerRunning,
       })
-    );
+      );
     navigate("/");
   };
 
@@ -62,7 +62,7 @@ const EditTask = () => {
   return (
     <Container>
       <TitleTask>Edit Task</TitleTask>
-      <Form onSubmit={handleSubmit}>
+      <Form>
         <Input
           type="text"
           placeholder="Task Name"
@@ -86,7 +86,7 @@ const EditTask = () => {
         />
       </Form>
       <ButtonContainer>
-        <LeftButton type="submit">Save</LeftButton>
+        <Button onClick={handleSubmit}>Save</Button>
         <RightButtonContainer>
           <TimerStyled>
             <IconAndText>
@@ -191,10 +191,6 @@ const ButtonContainer = styled.div`
   justify-content: space-between;
   align-items: flex-start;
   margin-top: 20px;
-`;
-
-const LeftButton = styled(Button)`
-  // Допълнителни стилове ако са нужни
 `;
 
 const RightButtonContainer = styled.div`
