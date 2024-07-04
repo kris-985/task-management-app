@@ -1,8 +1,8 @@
 import React, { useState } from "react";
 import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import { addTask } from "../store/actions";
 import styled from "styled-components";
+import { addTask } from "../reducers/taskReducer";
 
 const AddTask = () => {
   const [name, setName] = useState("");
@@ -57,9 +57,9 @@ const Container = styled.div`
 `;
 const Title = styled.h1`
   text-align: center;
-  color: #398AB9;
+  color: #398ab9;
   font-size: 40px;
-`
+`;
 const Form = styled.form`
   display: flex;
   flex-direction: column;
@@ -69,7 +69,7 @@ const Input = styled.input`
   margin-bottom: 10px;
   padding: 10px;
   font-size: 1.5em;
-  border: 3px solid #398AB9;
+  border: 3px solid #398ab9;
   border-radius: 5px;
 `;
 
@@ -80,7 +80,7 @@ const Textarea = styled.textarea`
   padding: 12px 20px;
   box-sizing: border-box;
   font-size: 1.5em;
-  border: 3px solid #398AB9;
+  border: 3px solid #398ab9;
   border-radius: 5px;
   resize: none;
 `;
@@ -89,7 +89,7 @@ const Select = styled.select`
   margin-bottom: 10px;
   padding: 10px;
   font-size: 1em;
-  border: 3px solid #398AB9;
+  border: 3px solid #398ab9;
   border-radius: 5px;
 `;
 
@@ -97,7 +97,7 @@ const Button = styled.button`
   width: 10rem;
   padding: 10px;
   font-size: 1.5em;
-  background: #398AB9;
+  background: #398ab9;
   color: #fff;
   border: none;
   border-radius: 5px;
@@ -109,4 +109,3 @@ const Button = styled.button`
     background: #0056b3;
   }
 `;
-

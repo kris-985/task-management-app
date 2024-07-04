@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { Link } from "react-router-dom";
-import { deleteTask, reorderTasks, resetTimer } from "../store/actions";
+import { deleteTasks, reorderTasks, resetTimer } from "../reducers/taskReducer";
 import styled from "styled-components";
 import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
 import { RiSearchLine } from "react-icons/ri";
@@ -10,13 +10,7 @@ import { FaUserClock } from "react-icons/fa";
 
 const TaskList = () => {
   const [search, setSearch] = useState("");
-  const tasks = useSelector((state) =>
-    [...state.tasks].sort((a, b) => {
-      if (!a.dueDate) return 1;
-      if (!b.dueDate) return -1;
-      return new Date(a.dueDate) - new Date(b.dueDate);
-    })
-  );
+  const { tasks = [] } = useSelector((state) => state.taskReducer);
   const dispatch = useDispatch();
 
   const filteredTasks = tasks.filter((task) =>
@@ -25,7 +19,7 @@ const TaskList = () => {
 
   const handleDelete = (id) => {
     if (window.confirm("Are you sure you want to delete this task?")) {
-      dispatch(deleteTask(id));
+      dispatch(deleteTasks(id));
     }
   };
 
@@ -63,7 +57,10 @@ const TaskList = () => {
       <DragDropContext onDragEnd={onDragEnd}>
         <Droppable droppableId="tasks">
           {(provided) => (
-            <ul {...provided.droppableProps} ref={provided.innerRef}>
+            <TaskListContainer
+              {...provided.droppableProps}
+              ref={provided.innerRef}
+            >
               {filteredTasks.map((task, index) => (
                 <Draggable key={task.id} draggableId={task.id} index={index}>
                   {(provided) => (
@@ -77,7 +74,7 @@ const TaskList = () => {
                         <p>{task.description}</p>
                         {task.priority && (
                           <TaskPriority priority={task.priority}>
-                            Priority:{""}
+                            Priority:{" "}
                             {task.priority.charAt(0).toUpperCase() +
                               task.priority.slice(1)}
                           </TaskPriority>
@@ -88,8 +85,8 @@ const TaskList = () => {
                           </Paragraph>
                         )}
                         <Paragraph>
-                          <FaUserClock /> {Math.floor(task.timeSpent / 3600)}h{""}
-                          {Math.floor((task.timeSpent % 3600) / 60)}m{""}
+                          <FaUserClock /> {Math.floor(task.timeSpent / 3600)}h
+                          {Math.floor((task.timeSpent % 3600) / 60)}m
                           {task.timeSpent % 60}s
                         </Paragraph>
                       </TaskInfo>
@@ -109,7 +106,7 @@ const TaskList = () => {
                 </Draggable>
               ))}
               {provided.placeholder}
-            </ul>
+            </TaskListContainer>
           )}
         </Droppable>
       </DragDropContext>
@@ -179,16 +176,37 @@ const SearchBar = styled.input`
   width: 100%;
 `;
 
+const TaskListContainer = styled.ul`
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  @media (max-width: 1200px) {
+    justify-content: space-around;
+  }
+`;
+
 const TaskItem = styled.li`
   display: flex;
-  align-items: center;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: flex-start;
   padding: 10px;
   border: 3px solid #398ab9;
-  margin: 30px;
+  margin: 10px;
   background-color: white;
+  box-shadow: 3px 3px 10px 0px #1c658c;
+  width: calc(33.33% - 20px);
+  box-sizing: border-box;
   box-shadow: 10px 10px 10px 0px #1c658c;
-  -webkit-box-shadow: 10px 10px 10px 6px #398ab9;
+  -webkit-box-shadow: 10px 10px 10px 3px #398ab9;
   -moz-box-shadow: 10px 10px 10px 5px rgba(12, 9, 214, 0.87);
+
+  @media (max-width: 1200px) {
+    width: calc(50% - 20px);
+  }
+  @media (max-width: 768px) {
+    width: calc(100% - 20px);
+  }
 `;
 
 const TaskInfo = styled.div`
@@ -214,12 +232,12 @@ const TaskPriority = styled.span`
 `;
 
 const Paragraph = styled.p`
-  font-size: 18px;
+  font-size: 14px;
 `;
 
 const Button = styled.button`
   padding: 5px 10px;
-  font-size: 0.9em;
+  font-size: 0.8em;
   background: #398ab9;
   color: #fff;
   border: none;
