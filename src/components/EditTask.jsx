@@ -4,8 +4,9 @@ import { useParams, useNavigate } from "react-router-dom";
 import { FaUserClock } from "react-icons/fa";
 import styled from "styled-components";
 import { editTask } from "../reducers/taskReducer";
+import Swal from "sweetalert2";
 
-const EditTask = () => {
+export const EditTask = () => {
   const { id } = useParams();
   const { tasks } = useSelector((state) => state.taskReducer);
   const task = tasks.find((task) => task.id === id);
@@ -51,7 +52,13 @@ const EditTask = () => {
         timeSpent,
         isTimerRunning,
       })
-      );
+    );
+    Swal.fire({
+      icon: "success",
+      title: "Your work has been saved",
+      showConfirmButton: false,
+      timer: 1500,
+    });
     navigate("/");
   };
 
@@ -92,7 +99,7 @@ const EditTask = () => {
             <IconAndText>
               <FaUserClockStyled />
               <Paragraph>
-                {Math.floor(timeSpent / 3600)}h{" "}
+                {Math.floor(timeSpent / 3600)}h
                 {Math.floor((timeSpent % 3600) / 60)}m {timeSpent % 60}s
               </Paragraph>
             </IconAndText>
@@ -105,8 +112,6 @@ const EditTask = () => {
     </Container>
   );
 };
-
-export default EditTask;
 
 const Container = styled.div`
   padding: 20px;

@@ -1,8 +1,6 @@
 import React from "react";
 import { Route, Routes } from "react-router-dom";
-import TaskList from "./components/TaskList";
-import AddTask from "./components/AddTask";
-import EditTask from "./components/EditTask";
+import { AddTask, EditTask, TaskList } from "./components";
 import "./index.css";
 
 const App = () => {

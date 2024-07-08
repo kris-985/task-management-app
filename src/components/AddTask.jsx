@@ -3,8 +3,9 @@ import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import styled from "styled-components";
 import { addTask } from "../reducers/taskReducer";
+import Swal from "sweetalert2";
 
-const AddTask = () => {
+export const AddTask = () => {
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
   const [priority, setPriority] = useState("low");
@@ -16,6 +17,11 @@ const AddTask = () => {
     e.preventDefault();
     if (name.trim() === "") return;
     dispatch(addTask({ name, description, priority, dueDate }));
+    Swal.fire({
+      title: "Good job!",
+      text: "Task added successfully!",
+      icon: "success",
+    });
     navigate("/");
   };
 
@@ -49,8 +55,6 @@ const AddTask = () => {
     </Container>
   );
 };
-
-export default AddTask;
 
 const Container = styled.div`
   padding: 20px;

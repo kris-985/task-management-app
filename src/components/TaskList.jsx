@@ -7,8 +7,9 @@ import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
 import { RiSearchLine } from "react-icons/ri";
 import { TbCalendarDue } from "react-icons/tb";
 import { FaUserClock } from "react-icons/fa";
+import Swal from "sweetalert2";
 
-const TaskList = () => {
+export const TaskList = () => {
   const [search, setSearch] = useState("");
   const { tasks = [] } = useSelector((state) => state.taskReducer);
   const dispatch = useDispatch();
@@ -18,9 +19,24 @@ const TaskList = () => {
   );
 
   const handleDelete = (id) => {
-    if (window.confirm("Are you sure you want to delete this task?")) {
-      dispatch(deleteTasks(id));
-    }
+    Swal.fire({
+      title: "Are you sure?",
+      text: "You won't be able to revert this!",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Yes, delete it!",
+    }).then((result) => {
+      if (result.isConfirmed) {
+        dispatch(deleteTasks(id));
+        Swal.fire({
+          title: "Deleted!",
+          text: "Your file has been deleted.",
+          icon: "success",
+        });
+      }
+    });
   };
 
   const onDragEnd = (result) => {
@@ -74,7 +90,7 @@ const TaskList = () => {
                         <p>{task.description}</p>
                         {task.priority && (
                           <TaskPriority priority={task.priority}>
-                            Priority:{" "}
+                            Priority:
                             {task.priority.charAt(0).toUpperCase() +
                               task.priority.slice(1)}
                           </TaskPriority>
@@ -114,11 +130,10 @@ const TaskList = () => {
   );
 };
 
-export default TaskList;
-
 const Container = styled.div`
   padding: 20px;
 `;
+
 const Header = styled.h1`
   text-align: center;
   color: #398ab9;
@@ -146,6 +161,7 @@ const AddButton = styled.button`
     background: #0056b3;
   }
 `;
+
 const ParentContainer = styled.div`
   display: flex;
   justify-content: center;
@@ -153,7 +169,7 @@ const ParentContainer = styled.div`
 `;
 
 const SearchContainer = styled.div`
-  position: relative;
+position: relative;
   display: flex;
   align-items: center;
   margin-top: 20px;
@@ -198,8 +214,6 @@ const TaskItem = styled.li`
   width: calc(33.33% - 20px);
   box-sizing: border-box;
   box-shadow: 10px 10px 10px 0px #1c658c;
-  -webkit-box-shadow: 10px 10px 10px 3px #398ab9;
-  -moz-box-shadow: 10px 10px 10px 5px rgba(12, 9, 214, 0.87);
 
   @media (max-width: 1200px) {
     width: calc(50% - 20px);
